@@ -202,10 +202,12 @@ def _build_prompt(dialog_text: str, interviewer_label: str) -> str:
     return f"""你是一位专业的面试分析师。下面是面试官在面试过程中提出的所有问题（已整理）。
 
 请完成以下任务：
-1. 分析这些问题，按逻辑关联性分组（相关的问题为同一组）
-2. 提取每个逻辑组中最核心的问题（去除重复或相似的变体表述）
-3. 保留原文，不要改写或合并
+1. **逐一列出所有问题**：将下面列表中的每个问题都列在"面试问题列表"中，不要遗漏任何问题
+2. **只进行去重**：如果两个问题完全一样（字面一致），才合并为一个；但即使意思相似，也要分别保留（保留所有不同的表述）
+3. **保留原文**：不要改写或创新，必须使用原文
 4. 最后用 2~3 句话总结本次面试的核心考察方向
+
+**重要**：目标是保留尽可能多的问题，不要因为相似就合并。例如"你有什么优势吗？"和"请说说你的优势"虽然意思接近，但都应该保留。
 
 严格按以下格式输出，不要添加任何额外内容：
 
@@ -377,6 +379,66 @@ def save_dialog_as_txt(
     content = "\n".join(lines)
     save_text(content, output_txt)
     logger.info(f"对话已保存为 TXT: {output_txt}")
+    
+    return output_txt
+
+
+def save_interviewer_turns_as_txt(
+    dialog: list,
+    audio_path: str,
+    interviewer_label: str = "面试官",
+    output_dir: str = OUTPUT_DIR,
+) -> str:
+    """
+    将面试官的发言单独提取并保存为 TXT 文件。
+    
+    格式示例：
+        [00:00 - 00:05] 你的工作背景如何？
+        [00:15 - 00:20] 能具体说说最近的项目吗？
+        
+    Args:
+        dialog:            结构化对话列表
+        audio_path:        音频文件路径（用于生成输出文件名）
+        interviewer_label: 面试官的标签（默认"面试官"）
+        output_dir:        输出目录
+        
+    Returns:
+        输出文件路径
+    """
+    audio_stem = Path(audio_path).stem
+    output_txt = build_output_path(audio_path, "interviewer_turns", output_dir, ".txt")
+    ensure_dirs(output_dir)
+    
+    # 提取面试官的发言
+    interviewer_turns = _extract_interviewer_turns(dialog, interviewer_label)
+    
+    lines = [
+        f"# 面试官发言记录：{audio_stem}",
+        "",
+        f"共 {len(interviewer_turns)} 轮发言",
+        "",
+        "=" * 80,
+        "",
+    ]
+    
+    for i, turn in enumerate(interviewer_turns, 1):
+        text  = turn.get("text", "")
+        start = turn.get("start", 0)
+        end   = turn.get("end", 0)
+        
+        # 时间戳
+        if start >= 0 and end > start:
+            timestamp = f"[{int(start):02d}:{int(start) % 60:02d} - {int(end):02d}:{int(end) % 60:02d}]"
+            lines.append(f"{i}. {timestamp} {text}")
+        else:
+            lines.append(f"{i}. {text}")
+    
+    lines.append("")
+    lines.append("=" * 80)
+    
+    content = "\n".join(lines)
+    save_text(content, output_txt)
+    logger.info(f"面试官发言已保存为 TXT: {output_txt}")
     
     return output_txt
 
