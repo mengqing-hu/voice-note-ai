@@ -318,6 +318,69 @@ def _extract_chunked(
     return result
 
 
+# ── 对话导出 ───────────────────────────────────────────────────
+
+def save_dialog_as_txt(
+    dialog: list,
+    audio_path: str,
+    output_dir: str = OUTPUT_DIR,
+) -> str:
+    """
+    将结构化对话导出为易读的 TXT 格式，每行按说话人标签显示。
+    
+    格式示例：
+        面试官：你的工作背景如何？
+        候选人：我有5年的工作经验...
+        
+    Args:
+        dialog:      结构化对话列表
+        audio_path:  音频文件路径（用于生成输出文件名）
+        output_dir:  输出目录
+        
+    Returns:
+        输出文件路径
+    """
+    audio_stem = Path(audio_path).stem
+    output_txt = build_output_path(audio_path, "dialog", output_dir, ".txt")
+    ensure_dirs(output_dir)
+    
+    lines = [
+        f"# 对话记录：{audio_stem}",
+        "",
+        f"共 {len(dialog)} 轮对话",
+        "",
+        "=" * 80,
+        "",
+    ]
+    
+    for i, item in enumerate(dialog, 1):
+        speaker = item.get("speaker", "未知")
+        text    = item.get("text", "")
+        start   = item.get("start", 0)
+        end     = item.get("end", 0)
+        
+        # 时间戳（如果有）
+        if start >= 0 and end > start:
+            timestamp = f"[{int(start):02d}:{int(start) % 60:02d} - {int(end):02d}:{int(end) % 60:02d}]"
+        else:
+            timestamp = ""
+        
+        # 格式化输出
+        if timestamp:
+            lines.append(f"{speaker}：{text}  {timestamp}")
+        else:
+            lines.append(f"{speaker}：{text}")
+    
+    lines.append("")
+    lines.append("=" * 80)
+    
+    content = "\n".join(lines)
+    save_text(content, output_txt)
+    logger.info(f"对话已保存为 TXT: {output_txt}")
+    
+    return output_txt
+
+
 # ── Markdown 报告 ─────────────────────────────────────────────
 
 def _save_markdown(result: dict, output_path: str) -> None:
