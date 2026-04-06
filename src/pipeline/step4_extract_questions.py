@@ -1,5 +1,5 @@
 """
-pipeline/extract_questions.py
+pipeline/step4_extract_questions.py
 模块4：调用 LLM 从结构化对话中提取面试问题
 - 输入: 结构化对话列表
 - 输出: 按顺序编号的面试问题列表 + 面试总结，保存为 JSON 和 Markdown
@@ -59,7 +59,7 @@ def extract_questions(
         }
 
     Usage:
-        from src.pipeline.extract_questions import extract_questions
+        from src.pipeline.step4_extract_questions import extract_questions
         from src.utils.llm_client import build_client_from_env
 
         client = build_client_from_env()

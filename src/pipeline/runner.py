@@ -15,10 +15,10 @@ from src.utils.device import print_device_info
 from src.utils.cache import StepCache
 from src.utils.llm_client import LLMClient
 
-from src.pipeline.transcribe import transcribe
-from src.pipeline.diarize import diarize
-from src.pipeline.postprocess import postprocess, get_speaker_stats
-from src.pipeline.extract_questions import extract_questions
+from src.pipeline.step1_transcribe import transcribe
+from src.pipeline.step2_diarize import diarize
+from src.pipeline.step3_postprocess import postprocess, get_speaker_stats
+from src.pipeline.step4_extract_questions import extract_questions
 
 load_dotenv()
 logger = get_logger(__name__)

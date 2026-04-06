@@ -1,5 +1,5 @@
 """
-pipeline/postprocess.py
+pipeline/step3_postprocess.py
 模块3：转录与说话人合并，生成结构化对话
 - 输入: Whisper transcript dict + diarization list
 - 输出: 结构化对话 JSON [{speaker, start, end, text}, ...]
@@ -44,7 +44,7 @@ def postprocess(
         ]
 
     Usage:
-        from src.pipeline.postprocess import postprocess
+        from src.pipeline.step3_postprocess import postprocess
         dialog = postprocess(transcript, diarization,
                              speaker_mapping={"SPEAKER_00": "面试官", "SPEAKER_01": "候选人"})
     """
@@ -132,7 +132,7 @@ def rename_speakers(dialog: list, mapping: dict) -> list:
         重命名后的对话列表
 
     Usage:
-        from src.pipeline.postprocess import rename_speakers
+        from src.pipeline.step3_postprocess import rename_speakers
         dialog = rename_speakers(dialog, mapping={"SPEAKER_00": "面试官", "SPEAKER_01": "候选人"})
     """
     return _rename_speakers(dialog, mapping)
@@ -161,7 +161,7 @@ def merge_transcript_diarization(
         结构化对话列表（保留原始说话人标签）
 
     Usage:
-        from src.pipeline.postprocess import merge_transcript_diarization
+        from src.pipeline.step3_postprocess import merge_transcript_diarization
         dialog = merge_transcript_diarization(transcript, diarization)
     """
     return postprocess(transcript, diarization, speaker_mapping=None, output_dir=output_dir, force=force)

@@ -1,5 +1,5 @@
 """
-pipeline/diarize.py
+pipeline/step2_diarize.py
 模块2：说话人分离（Speaker Diarization）
 - 输入: 音频文件路径
 - 输出: 每段时间对应的说话人标签，保存到 data/transcripts/

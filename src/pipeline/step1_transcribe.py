@@ -1,5 +1,5 @@
 """
-pipeline/transcribe.py
+pipeline/step1_transcribe.py
 模块1：Whisper 语音转录
 - 输入: 音频文件路径
 - 输出: 带时间戳的转录结果，保存到 data/transcripts/
@@ -49,7 +49,7 @@ def transcribe(
         }
 
     Usage:
-        from src.pipeline.transcribe import transcribe
+        from src.pipeline.step1_transcribe import transcribe
         transcript = transcribe("data/raw/interview_001.wav")
     """
     audio_path = str(audio_path)
