@@ -2,16 +2,21 @@
 .env
 
 # .gitignore
-.env.example
+# .env.example
 .env
 # *.txt
 __pycache__/
 db/
 .DS_Store
-*.md
+# *.md
 # .gitignore
 
 
 
 test.ipynb
+data/
+*.log
+
+__pycache__/
+__init__.py
 

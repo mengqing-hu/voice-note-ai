@@ -170,3 +170,70 @@ def build_output_path(audio_path: str, stage: str, output_dir: str, ext: str = "
     stem = get_stem(audio_path)
     filename = f"{stem}_{stage}{ext}"
     return str(Path(output_dir) / filename)
+
+
+# ── 音频特定数据目录 ─────────────────────────────────────────
+
+def get_audio_data_dir(audio_stem: str, base_dir: str = "data") -> dict:
+    """
+    为指定音频生成隔离的数据目录结构。
+    每个音频有独立的 cache/transcripts/processed/outputs 目录。
+
+    Args:
+        audio_stem:  音频文件名（无扩展名），如 "sensetime"
+        base_dir:    基础数据目录，默认 "data"
+
+    Returns:
+        {
+            "root":        "data/sensetime/",
+            "cache":       "data/sensetime/cache/",
+            "transcripts": "data/sensetime/transcripts/",
+            "processed":   "data/sensetime/processed/",
+            "outputs":     "data/sensetime/outputs/",
+        }
+
+    Usage:
+        dirs = get_audio_data_dir("interview_001")
+        print(dirs["transcripts"])  # → "data/interview_001/transcripts/"
+    """
+    root = Path(base_dir) / audio_stem
+    return {
+        "root":        str(root) + "/",
+        "cache":       str(root / "cache") + "/",
+        "transcripts": str(root / "transcripts") + "/",
+        "processed":   str(root / "processed") + "/",
+        "outputs":     str(root / "outputs") + "/",
+    }
+
+
+def ensure_audio_data_dirs(audio_stem: str, base_dir: str = "data") -> dict:
+    """
+    为指定音频创建隔离的数据目录结构，并返回目录字典。
+    同时保留全局 data/raw/ 目录作为音频源。
+
+    Args:
+        audio_stem:  音频文件名（无扩展名），如 "sensetime"
+        base_dir:    基础数据目录，默认 "data"
+
+    Returns:
+        {
+            "root":        "data/sensetime/",
+            "cache":       "data/sensetime/cache/",
+            "transcripts": "data/sensetime/transcripts/",
+            "processed":   "data/sensetime/processed/",
+            "outputs":     "data/sensetime/outputs/",
+        }
+
+    Usage:
+        DATA_DIRS = ensure_audio_data_dirs("interview_001")
+        # 自动创建 data/sensetime/{cache,transcripts,processed,outputs}/
+        # 使用 DATA_DIRS["transcripts"] 保存转录结果
+    """
+    dirs = get_audio_data_dir(audio_stem, base_dir)
+    ensure_dirs(
+        dirs["cache"],
+        dirs["transcripts"],
+        dirs["processed"],
+        dirs["outputs"],
+    )
+    return dirs
